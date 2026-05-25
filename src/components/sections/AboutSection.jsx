@@ -1,137 +1,9 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
+import ProfileCard from '../ui/ProfileCard'; // adjust path if needed
 
 const interests = ['⚽ Football', '🎮 Gaming', '🎵 Music', '📚 Learning', '🏃 Running'];
-
-function InteractivePhotoCard() {
-  const cardRef = useRef(null);
-  const imageRef = useRef(null);
-
-  const handleMouseMove = async (e) => {
-    try {
-      const { gsap } = await import('gsap');
-      const card = cardRef.current;
-      const image = imageRef.current;
-      if (!card || !image) return;
-      
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      
-      const rotateX = ((y - centerY) / centerY) * -15;
-      const rotateY = ((x - centerX) / centerX) * 15;
-      
-      gsap.to(card, {
-        rotateX,
-        rotateY,
-        transformPerspective: 1000,
-        ease: 'power2.out',
-        duration: 0.5
-      });
-      
-      gsap.to(image, {
-        x: (x - centerX) * 0.05,
-        y: (y - centerY) * 0.05,
-        ease: 'power2.out',
-        duration: 0.5
-      });
-    } catch (err) {}
-  };
-
-  const handleMouseLeave = async () => {
-    try {
-      const { gsap } = await import('gsap');
-      gsap.to(cardRef.current, {
-        rotateX: 0,
-        rotateY: 0,
-        ease: 'elastic.out(1, 0.3)',
-        duration: 1
-      });
-      gsap.to(imageRef.current, {
-        x: 0,
-        y: 0,
-        ease: 'elastic.out(1, 0.3)',
-        duration: 1
-      });
-    } catch (err) {}
-  };
-
-  return (
-    <div className="relative w-full aspect-[4/5] max-w-sm mx-auto" style={{ perspective: '1000px' }}>
-      <div
-        ref={cardRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        className="w-full h-full relative rounded-3xl overflow-hidden shadow-2xl cursor-pointer"
-        style={{
-          transformStyle: 'preserve-3d',
-          border: '1px solid rgba(255,255,255,0.08)',
-          background: 'rgba(19,19,31,0.5)',
-        }}
-      >
-        {/* Glow behind image */}
-        <div 
-          className="absolute inset-0 opacity-40 mix-blend-screen transition-opacity duration-500 hover:opacity-80"
-          style={{
-            background: 'radial-gradient(circle at 50% 50%, rgba(91,91,255,0.3) 0%, transparent 60%)',
-            transform: 'translateZ(-50px)'
-          }}
-        />
-        
-        {/* The Photo */}
-        <div
-          ref={imageRef}
-          className="absolute inset-5 rounded-2xl overflow-hidden"
-          style={{
-            transform: 'translateZ(30px)',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
-          }}
-        >
-          {/* You can replace this with your actual photo later! */}
-          <img 
-            src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop" 
-            alt="Tanjim"
-            className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-105 hover:scale-100"
-          />
-          {/* Subtle overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#04040a] via-transparent to-transparent opacity-80" />
-        </div>
-
-        {/* Floating badges */}
-        <div 
-          className="absolute bottom-12 right-10 px-4 py-2 rounded-full backdrop-blur-md"
-          style={{
-            background: 'rgba(91,91,255,0.15)',
-            border: '1px solid rgba(91,91,255,0.3)',
-            transform: 'translateZ(60px)',
-          }}
-        >
-          <span className="text-bright font-mono text-xs flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#5BFFC8] animate-pulse" />
-            Developer
-          </span>
-        </div>
-        
-        <div 
-          className="absolute top-12 left-10 px-3 py-1.5 rounded-full backdrop-blur-md"
-          style={{
-            background: 'rgba(255,91,141,0.15)',
-            border: '1px solid rgba(255,91,141,0.3)',
-            transform: 'translateZ(40px)',
-          }}
-        >
-          <span className="text-bright font-mono text-[10px] uppercase tracking-wider">
-            UI / UX
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function AboutSection() {
   const { ref: sectionRef, inView } = useInView({ threshold: 0.1, triggerOnce: true });
@@ -183,7 +55,7 @@ export default function AboutSection() {
 
         <div className="grid lg:grid-cols-2 gap-20 items-center">
 
-          {/* Left: Story */}
+          {/* ── Left: Story ── */}
           <div className="flex flex-col gap-8">
             <h2 className="heading-lg text-bright about-text-line">
               Crafting Digital
@@ -193,11 +65,13 @@ export default function AboutSection() {
 
             <div className="space-y-5 text-muted text-base leading-relaxed">
               <p className="about-text-line">
-                My programming journey began in my childhood, sparked by the magic of creating things on a screen. 
-                Today, I specialize in building <strong className="text-bright">premium, performant frontend experiences</strong> with React and Next.js.
+                My programming journey began in my childhood, sparked by the magic of creating things on a screen.
+                Today, I specialize in building{' '}
+                <strong className="text-bright">premium, performant frontend experiences</strong> with React and Next.js.
               </p>
               <p className="about-text-line">
-                I believe great software should not only be functional, but also feel delightful and human. Every pixel, animation, and interaction matters.
+                I believe great software should not only be functional, but also feel delightful and human.
+                Every pixel, animation, and interaction matters.
               </p>
             </div>
 
@@ -226,7 +100,9 @@ export default function AboutSection() {
 
             {/* Interests */}
             <div className="about-text-line">
-              <div className="text-sm font-bold text-muted uppercase tracking-widest mb-4">When I'm Not Coding</div>
+              <div className="text-sm font-bold text-muted uppercase tracking-widest mb-4">
+                When I'm Not Coding
+              </div>
               <div className="flex flex-wrap gap-2">
                 {interests.map((interest) => (
                   <span
@@ -243,24 +119,44 @@ export default function AboutSection() {
                 ))}
               </div>
             </div>
-
           </div>
 
-          {/* Right: Interactive Photo Card */}
-          <div className="flex flex-col gap-8 about-photo justify-center">
+          {/* ── Right: ProfileCard ── */}
+          <div className="flex flex-col gap-8 about-photo items-center justify-center relative">
+
             {/* Decorative number */}
             <div
-              className="absolute font-bold opacity-5 leading-none select-none -z-10 -right-10 top-0"
+              className="absolute font-bold opacity-5 leading-none select-none -z-10 -right-10 top-0 pointer-events-none"
               style={{ fontSize: 'clamp(8rem, 20vw, 14rem)', color: 'var(--accent)' }}
             >
               01
             </div>
 
-            <InteractivePhotoCard />
+            <ProfileCard
+              name="Tanjim"
+              title="Frontend Developer"
+              handle="P-tanjim"
+              status="Open to Work ✨"
+              contactText="Contact Me"
+              // ↓ Replace with your actual photo. Use a portrait shot cropped to ~4:5 ratio.
+              avatarUrl="https://images.unsplash.com/photo-1615109398623-88346a601842?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWFufGVufDB8fDB8fHww"
+              showUserInfo={true}
+              enableTilt={true}
+              enableMobileTilt={false}
+              behindGlowEnabled={true}
+              // ↓ Matches your portfolio's --accent purple
+              behindGlowColor="rgba(91, 91, 255, 0.55)"
+              behindGlowSize="55%"
+              // ↓ Purple → teal gradient matching your theme
+              innerGradient="linear-gradient(145deg, rgba(91,91,255,0.22) 0%, rgba(91,255,200,0.10) 100%)"
+              onContactClick={() => {
+                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            />
 
             {/* Quote */}
             <div
-              className="p-6 rounded-2xl relative overflow-hidden max-w-sm mx-auto mt-4"
+              className="p-6 rounded-2xl relative overflow-hidden max-w-sm w-full"
               style={{
                 background: 'rgba(13,13,22,0.8)',
                 border: '1px solid rgba(255,255,255,0.06)',
@@ -269,10 +165,12 @@ export default function AboutSection() {
               <div
                 className="absolute top-4 left-5 text-6xl font-bold opacity-10 leading-none"
                 style={{ color: 'var(--accent)' }}
-              >"</div>
+              >
+                "
+              </div>
               <p className="relative z-10 text-muted italic text-sm leading-relaxed pl-6">
-                A portfolio is the mirror of a developer. I strive to make mine reflect
-                not just my skills, but my passion for creating things that truly matter.
+                A portfolio is the mirror of a developer. I strive to make mine reflect not just
+                my skills, but my passion for creating things that truly matter.
               </p>
             </div>
 
