@@ -35,7 +35,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   overflow-x: hidden;
 }
 
@@ -47,6 +47,23 @@ body {
   cursor: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Hero containment — isolates layout/style changes inside hero from the rest of the page ── */
+#hero {
+  contain: layout style paint;
+}
+
+/* Promote only during GSAP intro; cleared in HeroAnimations onComplete */
+.hero-tag, .hero-headline, .hero-typewriter,
+.hero-desc, .hero-cta, .hero-social, .hero-stats, .hero-3d {
+  will-change: opacity, transform;
+}
+
+/* Below-fold sections: skip layout/paint until near viewport */
+main > section:not(#hero) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
 }
 
 /* ── Custom Scrollbar ── */

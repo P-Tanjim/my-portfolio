@@ -12,7 +12,6 @@ export function SplineScene({ scene, className }) {
             className="relative flex items-center justify-center"
             style={{ width: 80, height: 80 }}
           >
-            {/* Spinning ring loader */}
             <div
               style={{
                 width: 60,
@@ -38,7 +37,7 @@ export function SplineScene({ scene, className }) {
         </div>
       }
     >
-      <Spline scene={scene} className={className} />
+      <Spline scene={scene} className={className} renderOnDemand />
     </Suspense>
   );
 }

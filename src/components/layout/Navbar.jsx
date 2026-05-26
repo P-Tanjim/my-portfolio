@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
+import { useLenis } from '../effects/SmoothScroll';
+import { scrollToSection } from '../../lib/scroll';
 
 const navLinks = [
   { label: 'About', href: '#about' },
@@ -29,16 +30,12 @@ function Logo() {
   );
 }
 
-function GlassNav({ activeSection }) {
-  const pillRef = useRef(null);
+function GlassNav({ activeSection, lenis }) {
   const [hoveredIdx, setHoveredIdx] = useState(null);
 
   const handleNavClick = (e, href) => {
     e.preventDefault();
-    const target = document.querySelector(href);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    scrollToSection(href, lenis);
   };
 
   return (
@@ -94,7 +91,7 @@ function GlassNav({ activeSection }) {
   );
 }
 
-function NavButtons() {
+function NavButtons({ lenis }) {
   const handleDownloadCV = () => {
     // Placeholder - replace with actual CV URL
     const link = document.createElement('a');
@@ -105,7 +102,7 @@ function NavButtons() {
 
   const handleContact = (e) => {
     e.preventDefault();
-    document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
+    scrollToSection('#contact', lenis);
   };
 
   return (
@@ -145,7 +142,7 @@ function NavButtons() {
 }
 
 // Mobile hamburger menu
-function MobileMenu({ isOpen, onClose }) {
+function MobileMenu({ isOpen, onClose, lenis }) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -160,9 +157,7 @@ function MobileMenu({ isOpen, onClose }) {
   const handleNavClick = (e, href) => {
     e.preventDefault();
     onClose();
-    setTimeout(() => {
-      document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
-    }, 300);
+    setTimeout(() => scrollToSection(href, lenis), 300);
   };
 
   return (
@@ -215,20 +210,20 @@ function MobileMenu({ isOpen, onClose }) {
 }
 
 export default function Navbar() {
+  const lenis = useLenis();
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+    const updateFromScroll = (scrollY) => {
+      setScrolled(scrollY > 50);
 
-      // Detect active section
       const sections = ['about', 'skills', 'projects', 'education', 'contact'];
       for (const section of sections.reverse()) {
         const el = document.getElementById(section);
-        if (el && window.scrollY >= el.offsetTop - 200) {
+        if (el && scrollY >= el.offsetTop - 200) {
           setActiveSection(section);
           return;
         }
@@ -236,9 +231,22 @@ export default function Navbar() {
       setActiveSection('hero');
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    const onNativeScroll = () => updateFromScroll(window.scrollY);
+    window.addEventListener('scroll', onNativeScroll, { passive: true });
+
+    if (!lenis) {
+      return () => window.removeEventListener('scroll', onNativeScroll);
+    }
+
+    const onLenisScroll = ({ scroll }) => updateFromScroll(scroll);
+    lenis.on('scroll', onLenisScroll);
+    updateFromScroll(lenis.scroll);
+
+    return () => {
+      window.removeEventListener('scroll', onNativeScroll);
+      lenis.off('scroll', onLenisScroll);
+    };
+  }, [lenis]);
 
   return (
     <>
@@ -252,10 +260,10 @@ export default function Navbar() {
           <Logo />
 
           {/* Part 2: Glass nav links (center) */}
-          <GlassNav activeSection={activeSection} />
+          <GlassNav activeSection={activeSection} lenis={lenis} />
 
           {/* Part 3: Action buttons */}
-          <NavButtons />
+          <NavButtons lenis={lenis} />
 
           {/* Mobile hamburger */}
           <button
@@ -268,29 +276,45 @@ export default function Navbar() {
         </div>
       </header>
 
-      <MobileMenu isOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <MobileMenu isOpen={mobileOpen} onClose={() => setMobileOpen(false)} lenis={lenis} />
 
       {/* Scroll to top button */}
-      <ScrollToTop />
+      <ScrollToTop lenis={lenis} />
     </>
   );
 }
 
-function ScrollToTop() {
+function ScrollToTop({ lenis }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setVisible(window.scrollY > 500);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    const update = (scrollY) => setVisible(scrollY > 500);
+    const onNativeScroll = () => update(window.scrollY);
+    window.addEventListener('scroll', onNativeScroll, { passive: true });
+
+    if (!lenis) {
+      return () => window.removeEventListener('scroll', onNativeScroll);
+    }
+
+    const onLenisScroll = ({ scroll }) => update(scroll);
+    lenis.on('scroll', onLenisScroll);
+    update(lenis.scroll);
+
+    return () => {
+      window.removeEventListener('scroll', onNativeScroll);
+      lenis.off('scroll', onLenisScroll);
+    };
+  }, [lenis]);
 
   if (!visible) return null;
 
   return (
     <button
       className="scroll-top-btn"
-      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      onClick={() => {
+        if (lenis) lenis.scrollTo(0);
+        else window.scrollTo({ top: 0, behavior: 'smooth' });
+      }}
       aria-label="Scroll to top"
     >
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

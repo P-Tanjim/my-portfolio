@@ -1,6 +1,9 @@
 'use client';
+import { useLenis } from '../effects/SmoothScroll';
+import { scrollToSection } from '../../lib/scroll';
 
 export default function Footer() {
+  const lenis = useLenis();
   const year = new Date().getFullYear();
 
   return (
@@ -39,9 +42,9 @@ export default function Footer() {
               <a
                 key={link}
                 href={`#${link.toLowerCase()}`}
-                onClick={e => {
+                onClick={(e) => {
                   e.preventDefault();
-                  document.querySelector(`#${link.toLowerCase()}`)?.scrollIntoView({ behavior: 'smooth' });
+                  scrollToSection(`#${link.toLowerCase()}`, lenis);
                 }}
                 className="text-xs text-muted hover:text-bright transition-colors duration-300"
                 style={{ fontFamily: 'Space Mono', letterSpacing: '0.05em' }}

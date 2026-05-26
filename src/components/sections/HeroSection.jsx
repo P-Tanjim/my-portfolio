@@ -1,14 +1,7 @@
-// ← NO 'use client' — this is a Server Component now
-import dynamic from 'next/dynamic';
 import TypewriterText from '../ui/TypewriterText';
 import HeroAnimations from '../ui/HeroAnimations';
 
 import SplineLazy from '../ui/SplineLazy';
-
-const LightRays = dynamic(
-  () => import('../effects/LightRays'),
-  { ssr: false }
-);
 
 const titles = ['Frontend Developer', 'React Specialist', 'UI Craftsman', 'Next.js Engineer'];
 
@@ -47,19 +40,14 @@ export default function HeroSection() {
       {/* Renders null — just fires GSAP timeline after hydration */}
       <HeroAnimations />
 
-      <LightRays
-        raysOrigin="top-center"
-        raysColor="#5B5BFF"
-        raysSpeed={1}
-        lightSpread={0.5}
-        rayLength={1.8}
-        pulsating={false}
-        fadeDistance={1.4}
-        saturation={1.0}
-        followMouse={false}
-        mouseInfluence={0}
-        noiseAmount={0.03}
-        distortion={0.025}
+      {/* Lightweight static glow (replaces WebGL light rays) */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        aria-hidden
+        style={{
+          background:
+            'radial-gradient(ellipse 90% 55% at 50% -15%, rgba(91,91,255,0.14) 0%, transparent 65%)',
+        }}
       />
 
       {/* Fine grid texture */}
@@ -92,7 +80,7 @@ export default function HeroSection() {
         <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-4 min-h-[80vh]">
 
           {/* LEFT */}
-          <div className="flex flex-col gap-7 ml-10 w-full lg:w-[30%] z-10 self-start mt-20">
+          <div className="flex flex-col gap-7 ml-10 w-full lg:w-[30%] z-20 self-start mt-20 pointer-events-none">
             <div className="hero-tag">
               <span className="tag-pill">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent-3 animate-pulse" />
@@ -135,7 +123,7 @@ export default function HeroSection() {
 
           {/* MIDDLE: Spline */}
           <div
-            className="hero-3d absolute w-full flex items-center justify-center z-0"
+            className="hero-3d absolute w-full flex items-center justify-center z-10"
             style={{ height: 600 }}
           >
             <div className="relative w-full h-full rounded-2xl overflow-hidden">
@@ -153,16 +141,16 @@ export default function HeroSection() {
           </div>
 
           {/* RIGHT */}
-          <div className="flex flex-col gap-7 w-full lg:w-[30%] z-10 lg:mt-32">
+          <div className="flex flex-col gap-7 w-full lg:w-[30%] z-20 lg:mt-32 pointer-events-none">
             <p
-              className="hero-desc leading-relaxed text-sm md:text-base"
+              className="hero-desc leading-relaxed text-sm md:text-base pointer-events-none"
               style={{ color: 'rgba(232,232,255,0.5)' }}
             >
               I craft premium digital experiences with cutting-edge technologies —
               turning complex ideas into smooth, beautiful, and performant web applications.
             </p>
 
-            <div className="hero-social flex flex-wrap hover:cursor-none items-center gap-2.5">
+            <div className="hero-social flex flex-wrap hover:cursor-none items-center gap-2.5 pointer-events-auto">
               <SocialLink href="https://github.com/P-tanjim" label="GitHub"   icon="</>" />
               <SocialLink href="https://www.linkedin.com/in/moksedur/"                            label="LinkedIn" icon="in" />
               <SocialLink href="https://mail.google.com/mail/?view=cm&fs=1&to=moksedurtanjim27@gmail.com&su=Portfolio%20Contact&body=Hello%20Tanjim,"                            label="Gmail"  icon="✉" />
@@ -178,7 +166,7 @@ export default function HeroSection() {
             </div>
 
             <div
-              className="hero-stats grid grid-cols-2 gap-4 pt-5"
+              className="hero-stats grid grid-cols-2 gap-4 pt-5 pointer-events-none"
               style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
             >
               {[

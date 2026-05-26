@@ -2,10 +2,13 @@
 import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import ProfileCard from '../ui/ProfileCard';
+import { useLenis } from '../effects/SmoothScroll';
+import { scrollToSection } from '../../lib/scroll';
 
 const interests = ['⚽ Football', '🎮 Gaming', '🎵 Music', '📚 Learning', '🏃 Running'];
 
 export default function AboutSection() {
+  const lenis = useLenis();
   const { ref: sectionRef, inView } = useInView({ threshold: 0.1, triggerOnce: true });
 
   useEffect(() => {
@@ -149,9 +152,7 @@ export default function AboutSection() {
               behindGlowSize="55%"
               // ↓ Purple → teal gradient matching your theme
               innerGradient="linear-gradient(145deg, rgba(91,91,255,0.22) 0%, rgba(91,255,200,0.10) 100%)"
-              onContactClick={() => {
-                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+              onContactClick={() => scrollToSection('#contact', lenis)}
             />
 
             {/* Quote */}

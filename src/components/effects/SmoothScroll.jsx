@@ -1,5 +1,6 @@
 'use client';
-import { useEffect, createContext, useContext, useRef } from 'react';
+import { useEffect, createContext, useContext, useState } from 'react';
+import { getPerformanceProfile } from '../../lib/performance';
 
 const LenisContext = createContext(null);
 
@@ -8,11 +9,15 @@ export function useLenis() {
 }
 
 export default function SmoothScrollProvider({ children }) {
-  const lenisRef = useRef(null);
+  const [lenis, setLenis] = useState(null);
 
   useEffect(() => {
-    let lenis = null;
+    const profile = getPerformanceProfile();
+    if (!profile.smoothScroll) return;
+
+    let instance = null;
     let ticker = null;
+    let cancelled = false;
 
     const init = async () => {
       try {
@@ -21,25 +26,22 @@ export default function SmoothScrollProvider({ children }) {
           import('gsap'),
         ]);
 
-        lenis = new Lenis({
-          duration: 1.1,           // was 1.4 — less interpolation work per frame
-          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-          orientation: 'vertical',
-          gestureOrientation: 'vertical',
+        if (cancelled) return;
+
+        instance = new Lenis({
+          lerp: profile.lowEnd ? 0.12 : 0.1,
           smoothWheel: true,
           wheelMultiplier: 1,
-          touchMultiplier: 2,
+          touchMultiplier: 1.5,
+          autoRaf: false,
         });
 
-        lenisRef.current = lenis;
+        setLenis(instance);
 
-        // ── Key fix: share GSAP's ticker instead of running a separate RAF loop ──
-        // GSAP is already running a RAF for hero animations.
-        // Lenis subscribing to it means ONE combined RAF, not two competing ones.
-        gsap.ticker.lagSmoothing(0); // don't skip frames under load
-        ticker = gsap.ticker.add((time) => {
-          lenis.raf(time * 1000); // GSAP time is in seconds, Lenis needs ms
-        });
+        ticker = () => {
+          instance.raf(performance.now());
+        };
+        gsap.ticker.add(ticker);
       } catch (e) {
         console.warn('SmoothScroll init failed, using native scroll:', e);
       }
@@ -48,19 +50,17 @@ export default function SmoothScrollProvider({ children }) {
     init();
 
     return () => {
+      cancelled = true;
+
       if (ticker) {
         import('gsap').then(({ gsap }) => gsap.ticker.remove(ticker)).catch(() => {});
       }
-      if (lenisRef.current) {
-        lenisRef.current.destroy();
-        lenisRef.current = null;
+      if (instance) {
+        instance.destroy();
       }
+      setLenis(null);
     };
   }, []);
 
-  return (
-    <LenisContext.Provider value={lenisRef}>
-      {children}
-    </LenisContext.Provider>
-  );
+  return <LenisContext.Provider value={lenis}>{children}</LenisContext.Provider>;
 }
