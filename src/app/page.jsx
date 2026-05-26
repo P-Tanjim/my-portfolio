@@ -23,11 +23,11 @@ export default function Home() {
 
       <main>
         <HeroSection />
-        {/* <AboutSection />
+        <AboutSection />
         <SkillsSection />
         <ProjectsSection />
         <EducationSection />
-        <ContactSection /> */}
+        <ContactSection />
       </main>
 
       <Footer />
