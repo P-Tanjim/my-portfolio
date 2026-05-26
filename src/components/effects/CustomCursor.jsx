@@ -28,7 +28,8 @@ export default function CustomCursor() {
 
     // ── Ring: smoothly lagged via RAF, also compositor-only ──
     const animateRing = () => {
-      const ease = 0.12;
+      // 0.25 = ring reaches 99% of target in ~140ms at 60fps (was 0.12 = ~600ms)
+      const ease = 0.25;
       ringX.current += (mouseX.current - ringX.current) * ease;
       ringY.current += (mouseY.current - ringY.current) * ease;
       ring.style.transform = `translate(${ringX.current}px, ${ringY.current}px)`;

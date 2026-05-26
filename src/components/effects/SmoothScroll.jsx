@@ -12,12 +12,17 @@ export default function SmoothScrollProvider({ children }) {
 
   useEffect(() => {
     let lenis = null;
+    let ticker = null;
 
-    const initLenis = async () => {
+    const init = async () => {
       try {
-        const { default: Lenis } = await import('lenis');
+        const [{ default: Lenis }, { gsap }] = await Promise.all([
+          import('lenis'),
+          import('gsap'),
+        ]);
+
         lenis = new Lenis({
-          duration: 1.4,
+          duration: 1.1,           // was 1.4 — less interpolation work per frame
           easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
           orientation: 'vertical',
           gestureOrientation: 'vertical',
@@ -28,19 +33,24 @@ export default function SmoothScrollProvider({ children }) {
 
         lenisRef.current = lenis;
 
-        const raf = (time) => {
-          lenis.raf(time);
-          requestAnimationFrame(raf);
-        };
-        requestAnimationFrame(raf);
+        // ── Key fix: share GSAP's ticker instead of running a separate RAF loop ──
+        // GSAP is already running a RAF for hero animations.
+        // Lenis subscribing to it means ONE combined RAF, not two competing ones.
+        gsap.ticker.lagSmoothing(0); // don't skip frames under load
+        ticker = gsap.ticker.add((time) => {
+          lenis.raf(time * 1000); // GSAP time is in seconds, Lenis needs ms
+        });
       } catch (e) {
-        console.warn('Lenis not available, using native scroll');
+        console.warn('SmoothScroll init failed, using native scroll:', e);
       }
     };
 
-    initLenis();
+    init();
 
     return () => {
+      if (ticker) {
+        import('gsap').then(({ gsap }) => gsap.ticker.remove(ticker)).catch(() => {});
+      }
       if (lenisRef.current) {
         lenisRef.current.destroy();
         lenisRef.current = null;
