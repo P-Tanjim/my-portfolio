@@ -1,5 +1,6 @@
 'use client';
 import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 import { useInView } from '../../hooks/useInView';
 
 const SplineScene = dynamic(
@@ -21,9 +22,18 @@ function SplineSkeleton() {
 
 export default function SplineLazy({ scene, className }) {
   const [ref, inView] = useInView();
+  // Delay mounting by 200ms after visible — lets GSAP animations finish first
+  const [shouldMount, setShouldMount] = useState(false);
+
+  useEffect(() => {
+    if (!inView || shouldMount) return;
+    const t = setTimeout(() => setShouldMount(true), 200);
+    return () => clearTimeout(t);
+  }, [inView, shouldMount]);
+
   return (
     <div ref={ref} className="w-full h-full">
-      {inView
+      {shouldMount
         ? <SplineScene scene={scene} className={className} />
         : <SplineSkeleton />
       }

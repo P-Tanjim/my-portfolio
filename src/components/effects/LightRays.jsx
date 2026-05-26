@@ -201,7 +201,9 @@ export default function LightRays({
       const rgb = hexToRgb(raysColor);
 
       const resize = () => {
-        const dpr = Math.min(window.devicePixelRatio, 2);
+        // Cap DPR at 1 — rays are blurry by nature, nobody sees the difference
+        // but halving DPR cuts pixel count to 1/4 on retina displays
+        const dpr = 1;
         const w = containerRef.current?.clientWidth || window.innerWidth;
         const h = containerRef.current?.clientHeight || window.innerHeight;
         canvas.width = w * dpr;
@@ -228,15 +230,21 @@ export default function LightRays({
 
       window.addEventListener('resize', resize);
 
+      // Throttle to 30fps — rays are slow ambient effects, imperceptible at half rate
+      let frameCount = 0;
       const loop = (t) => {
-        gl.useProgram(program);
-        gl.uniform1f(u.iTime, t * 0.001);
-        const sm = smoothMouseRef.current;
-        const m = mouseRef.current;
-        sm.x = sm.x * 0.92 + m.x * 0.08;
-        sm.y = sm.y * 0.92 + m.y * 0.08;
-        gl.uniform2f(u.mousePos, sm.x, sm.y);
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        frameCount++;
+        // Skip odd frames → ~30fps instead of 60fps
+        if (frameCount % 2 === 0) {
+          gl.useProgram(program);
+          gl.uniform1f(u.iTime, t * 0.001);
+          const sm = smoothMouseRef.current;
+          const m = mouseRef.current;
+          sm.x = sm.x * 0.92 + m.x * 0.08;
+          sm.y = sm.y * 0.92 + m.y * 0.08;
+          gl.uniform2f(u.mousePos, sm.x, sm.y);
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+        }
         animationIdRef.current = requestAnimationFrame(loop);
       };
       animationIdRef.current = requestAnimationFrame(loop);

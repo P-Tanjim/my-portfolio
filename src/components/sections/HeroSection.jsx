@@ -53,7 +53,7 @@ export default function HeroSection() {
         raysSpeed={1}
         lightSpread={0.5}
         rayLength={1.8}
-        pulsating={true}
+        pulsating={false}
         fadeDistance={1.4}
         saturation={1.0}
         followMouse={false}

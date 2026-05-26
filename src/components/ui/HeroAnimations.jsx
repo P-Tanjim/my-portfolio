@@ -36,26 +36,5 @@ export default function HeroAnimations() {
     })();
   }, []);
 
-  useEffect(() => {
-    let rafId = null;
-
-    const handleMouse = (e) => {
-      if (rafId) return; // skip frames, max 60fps
-      rafId = requestAnimationFrame(() => {
-        // dispatch a custom event LightRays can listen to
-        window.dispatchEvent(new CustomEvent('hero-mouse', {
-          detail: { x: e.clientX, y: e.clientY }
-        }));
-        rafId = null;
-      });
-    };
-
-    window.addEventListener('mousemove', handleMouse, { passive: true });
-    return () => {
-      window.removeEventListener('mousemove', handleMouse);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, []);
-
   return null;
 }

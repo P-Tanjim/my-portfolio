@@ -67,13 +67,17 @@ body {
 /* ── Custom Cursor ── */
 .cursor-dot {
   position: fixed;
+  /* Anchored at top-left — JS drives position via transform: translate(x,y) */
+  left: 0;
+  top: 0;
   width: var(--cursor-size);
   height: var(--cursor-size);
   background: var(--accent);
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
-  transform: translate(-50%, -50%);
+  /* -50% offsets center the dot on the cursor hotpoint */
+  transform: translate(calc(-50%), calc(-50%));
   transition: width 0.2s var(--ease-smooth), 
               height 0.2s var(--ease-smooth),
               background 0.2s ease;
@@ -83,13 +87,17 @@ body {
 
 .cursor-ring {
   position: fixed;
+  /* Anchored at top-left — JS drives position via transform: translate(x,y) */
+  left: 0;
+  top: 0;
   width: var(--cursor-ring-size);
   height: var(--cursor-ring-size);
   border: 1.5px solid rgba(91, 91, 255, 0.6);
   border-radius: 50%;
   pointer-events: none;
   z-index: 9998;
-  transform: translate(-50%, -50%);
+  /* -50% offsets center the ring on the cursor hotpoint */
+  transform: translate(calc(-50%), calc(-50%));
   transition: width 0.3s var(--ease-expo),
               height 0.3s var(--ease-expo),
               border-color 0.2s ease;
