@@ -261,13 +261,19 @@ export default function LightRays({
     const handleMouseMove = (e) => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
+      const clientX = e.detail?.x ?? e.clientX;
+      const clientY = e.detail?.y ?? e.clientY;
       mouseRef.current = {
-        x: (e.clientX - rect.left) / rect.width,
-        y: (e.clientY - rect.top) / rect.height,
+        x: (clientX - rect.left) / rect.width,
+        y: (clientY - rect.top) / rect.height,
       };
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('hero-mouse', handleMouseMove, { passive: true });
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener('hero-mouse', handleMouseMove);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
   }, [followMouse]);
 
   return (

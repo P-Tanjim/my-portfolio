@@ -218,19 +218,19 @@ const ProfileCardComponent = ({
     const shell = shellRef.current;
     if (!shell) return;
 
-    shell.addEventListener('pointerenter', handlePointerEnter);
-    shell.addEventListener('pointermove', handlePointerMove);
-    shell.addEventListener('pointerleave', handlePointerLeave);
+    shell.addEventListener('pointerenter', handlePointerEnter, { passive: true });
+    shell.addEventListener('pointermove', handlePointerMove, { passive: true });
+    shell.addEventListener('pointerleave', handlePointerLeave, { passive: true });
 
     const handleClick = () => {
       if (!enableMobileTilt || location.protocol !== 'https:') return;
       const anyMotion = window.DeviceMotionEvent;
       if (anyMotion && typeof anyMotion.requestPermission === 'function') {
         anyMotion.requestPermission().then(state => {
-          if (state === 'granted') window.addEventListener('deviceorientation', handleDeviceOrientation);
+          if (state === 'granted') window.addEventListener('deviceorientation', handleDeviceOrientation, { passive: true });
         }).catch(console.error);
       } else {
-        window.addEventListener('deviceorientation', handleDeviceOrientation);
+        window.addEventListener('deviceorientation', handleDeviceOrientation, { passive: true });
       }
     };
     shell.addEventListener('click', handleClick);

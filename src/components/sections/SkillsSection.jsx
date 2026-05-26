@@ -146,9 +146,9 @@ function SkillBentoCard({ skill, index }) {
   useEffect(() => {
     const card = cardRef.current;
     if (!card) return;
-    card.addEventListener('mouseenter', handleMouseEnter);
-    card.addEventListener('mouseleave', handleMouseLeave);
-    card.addEventListener('mousemove', handleMouseMove);
+    card.addEventListener('mouseenter', handleMouseEnter, { passive: true });
+    card.addEventListener('mouseleave', handleMouseLeave, { passive: true });
+    card.addEventListener('mousemove', handleMouseMove, { passive: true });
     return () => {
       card.removeEventListener('mouseenter', handleMouseEnter);
       card.removeEventListener('mouseleave', handleMouseLeave);

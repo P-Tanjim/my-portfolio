@@ -1,7 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
-import ProfileCard from '../ui/ProfileCard'; // adjust path if needed
+import ProfileCard from '../ui/ProfileCard';
 
 const interests = ['⚽ Football', '🎮 Gaming', '🎵 Music', '📚 Learning', '🏃 Running'];
 
